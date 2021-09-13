@@ -32,3 +32,5 @@ const launchesSchema = new mongoose.Schema({
   },
   customers: [String],
 });
+
+module.exports = mongoose.model("Launch", launchesSchema);
