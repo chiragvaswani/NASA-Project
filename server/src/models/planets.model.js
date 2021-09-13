@@ -1,7 +1,9 @@
 const fs = require("fs");
 const path = require("path");
-
 const parse = require("csv-parse");
+
+const planets = require("./planets.mongo");
+const planetsRouter = require("../routes/planets/planets.router");
 
 const habitablePlanets = [];
 
@@ -22,8 +24,11 @@ function loadPlanetsData() {
           columns: true,
         })
       ) // pipe function connects a readable stream source to a writable stream destination
-      .on("data", (data) => {
-        if (isHabitable(data)) habitablePlanets.push(data);
+      .on("data", async (data) => {
+        if (isHabitable(data))
+          await planets.create({
+            keplerName: data.kepler_name,
+          });
       })
       .on("error", (err) => {
         reject(err);
