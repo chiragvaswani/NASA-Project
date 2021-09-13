@@ -5,8 +5,6 @@ const parse = require("csv-parse");
 const planets = require("./planets.mongo");
 const planetsRouter = require("../routes/planets/planets.router");
 
-const habitablePlanets = [];
-
 const isHabitable = (planet) =>
   planet["koi_disposition"] === "CONFIRMED" &&
   planet["koi_insol"] > 0.36 &&
@@ -25,19 +23,35 @@ function loadPlanetsData() {
         })
       ) // pipe function connects a readable stream source to a writable stream destination
       .on("data", async (data) => {
-        if (isHabitable(data))
-          await planets.create({
-            keplerName: data.kepler_name,
-          });
+        if (isHabitable(data)) savePlanet(data);
       })
       .on("error", (err) => {
         reject(err);
       })
-      .on("end", () => {
-        console.log(`${habitablePlanets.length} habitable planets found.`);
+      .on("end", async () => {
+        const countPlanetsFound = (await getAllPlanets()).length;
+        console.log(`${countPlanetsFound} habitable planets found.`);
         resolve();
       });
   });
+}
+
+async function savePlanet(planet) {
+  try {
+    await planets.updateOne(
+      {
+        keplerName: planet.kepler_name,
+      },
+      {
+        keplerName: planet.kepler_name,
+      },
+      {
+        upsert: true,
+      }
+    );
+  } catch (err) {
+    console.error(`Could not save a planet ${err}`);
+  }
 }
 
 async function getAllPlanets() {
