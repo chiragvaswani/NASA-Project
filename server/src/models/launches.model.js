@@ -28,8 +28,14 @@ function abortLaunchById(launchId) {
   return aborted;
 }
 
-function getAllLaunches() {
-  return Array.from(launches.values());
+async function getAllLaunches() {
+  return await launchesDatabase.find(
+    {},
+    {
+      _id: 0,
+      __v: 0,
+    }
+  );
 }
 
 async function saveLaunch(launch) {
