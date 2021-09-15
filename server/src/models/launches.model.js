@@ -5,8 +5,6 @@ const launchesDatabase = require("./launches.mongo");
 
 const DEFAULT_FLIGHT_NUMBER = 100;
 
-let latestFlightNumber = 100;
-
 const launch = {
   flightNumber: 100,
   mission: "Kepler Exploration X",
@@ -54,7 +52,7 @@ async function saveLaunch(launch) {
 
   if (!planet) throw new Error("No matching planet was found!");
 
-  await launchesDatabase.updateOne(
+  await launchesDatabase.findOneAndUpdate(
     {
       flightNumber: launch.flightNumber,
     },
@@ -65,21 +63,22 @@ async function saveLaunch(launch) {
   );
 }
 
-function addNewLaunch(launch) {
-  launches.set(
-    ++latestFlightNumber,
-    Object.assign(launch, {
-      success: true,
-      upcoming: true,
-      customers: ["NASA"],
-      flightNumber: latestFlightNumber,
-    })
-  );
+async function scheduleNewLaunch(launch) {
+  const newFlightNumber = (await getLatestFlightNumber()) + 1;
+
+  const newLaunch = Object.assign(launch, {
+    success: true,
+    upcoming: true,
+    customers: ["NASA"],
+    flightNumber: newFlightNumber,
+  });
+
+  await saveLaunch(newLaunch);
 }
 
 module.exports = {
   getAllLaunches,
-  addNewLaunch,
   existsLaunchWithId,
   abortLaunchById,
+  scheduleNewLaunch,
 };
