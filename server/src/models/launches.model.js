@@ -24,11 +24,17 @@ async function existsLaunchWithId(launchId) {
   });
 }
 
-function abortLaunchById(launchId) {
-  const aborted = launches.get(launchId);
-  aborted.upcoming = false;
-  aborted.success = false;
-  return aborted;
+async function abortLaunchById(launchId) {
+  const aborted = await launchesDatabase.updateOne(
+    {
+      flightNumber: launchId,
+    },
+    {
+      upcoming: false,
+      success: false,
+    }
+  );
+  return aborted.modifiedCount === 1 && aborted.acknowledged === 1;
 }
 
 async function getLatestFlightNumber() {
