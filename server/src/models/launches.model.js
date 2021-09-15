@@ -3,6 +3,8 @@ const planets = require("./planets.mongo.js");
 
 const launchesDatabase = require("./launches.mongo");
 
+const DEFAULT_FLIGHT_NUMBER = 100;
+
 let latestFlightNumber = 100;
 
 const launch = {
@@ -10,7 +12,7 @@ const launch = {
   mission: "Kepler Exploration X",
   rocket: "Explorer IS1",
   launchDate: new Date("December 27, 2030"),
-  target: "Kepler-442 b",
+  target: "Kepler-442 b ",
   customer: ["NASA"],
   upcoming: true,
   success: true,
@@ -27,6 +29,12 @@ function abortLaunchById(launchId) {
   aborted.upcoming = false;
   aborted.success = false;
   return aborted;
+}
+
+async function getLatestFlightNumber() {
+  const latestLaunch = await launchesDatabase.findOne({}).sort("-flightNumber");
+  if (!latestLaunch) return DEFAULT_FLIGHT_NUMBER;
+  return latestLaunch.flightNumber;
 }
 
 async function getAllLaunches() {
