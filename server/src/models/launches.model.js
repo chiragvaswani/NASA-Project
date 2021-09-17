@@ -44,6 +44,7 @@ async function getLatestFlightNumber() {
 }
 
 async function getAllLaunches() {
+  console.log("In getAllLaunches");
   return await launchesDatabase.find(
     {},
     {
