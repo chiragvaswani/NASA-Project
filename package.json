@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/chiragvaswani/NASA-Project#readme",
   "dependencies": {
+    "axios": "^0.21.4",
     "morgan": "^1.10.0"
   }
 }
