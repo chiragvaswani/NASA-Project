@@ -1,4 +1,5 @@
-const launches = new Map();
+const axios = require("axios");
+// const launches = new Map();
 const planets = require("./planets.mongo.js");
 
 const launchesDatabase = require("./launches.mongo");
@@ -17,6 +18,32 @@ const launch = {
 };
 
 saveLaunch(launch);
+
+const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query";
+
+async function loadLaunchesData() {
+  console.log("Load launches");
+  const response = await axios.post(SPACEX_API_URL, {
+    query: {},
+    options: {
+      populate: [
+        {
+          path: "rocket",
+          select: {
+            name: 1,
+            flight_number: 1,
+          },
+        },
+        {
+          path: "payloads",
+          select: {
+            customers: 1,
+          },
+        },
+      ],
+    },
+  });
+}
 
 async function existsLaunchWithId(launchId) {
   return await launchesDatabase.findOne({
@@ -86,6 +113,7 @@ async function scheduleNewLaunch(launch) {
 }
 
 module.exports = {
+  loadLaunchesData,
   getAllLaunches,
   existsLaunchWithId,
   abortLaunchById,
