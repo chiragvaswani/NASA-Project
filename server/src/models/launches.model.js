@@ -116,6 +116,9 @@ async function getAllLaunches(skip, limit) {
         __v: 0,
       }
     )
+    .sort({
+      flightNumber: 1,
+    })
     .skip(skip)
     .limit(limit);
 }
